@@ -1,33 +1,31 @@
 package Ejercicio2;
 import java.util.Random;
+import java.util.Scanner;
 
-public class BatallaNaval{
+public class BatallaNaval {
 
-  //metodo que recibe la matriz de 9x9
     public static void inicializar(String[][] matriz) {
-        for (int i = 0; i < matriz.length; i++) { //recorre las filas
-            for (int j = 0; j < matriz[i].length; j++) { //recorre las columnas
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
                 matriz[i][j] = "~";
             }
         }
     }
 
-
     public static void colocarBarcos(String[][] matriz) {
         Random random = new Random();
-        int barcos = 3; 
+        int barcos = 3;
 
         while (barcos > 0) {
             int fila = random.nextInt(9);
             int columna = random.nextInt(9);
-            int orientacion = random.nextInt(2); 
-            int tamaño = barcos; 
+            int orientacion = random.nextInt(2);
+            int tamaño = barcos;
 
             boolean sePuedeColocar = true;
 
-           
-            if (orientacion == 0) { 
-                if (columna + tamaño > 9) sePuedeColocar = false; 
+            if (orientacion == 0) { // horizontal
+                if (columna + tamaño > 9) sePuedeColocar = false;
                 else {
                     for (int j = 0; j < tamaño; j++) {
                         if (matriz[fila][columna + j].equals("*")) {
@@ -36,11 +34,11 @@ public class BatallaNaval{
                         }
                     }
                 }
-            } else { 
+            } else { // vertical
                 if (fila + tamaño > 9) sePuedeColocar = false;
                 else {
                     for (int i = 0; i < tamaño; i++) {
-                        if (matriz[fila + i][columna].equals("*")) { //desplazamiento del barco de manera vertical
+                        if (matriz[fila + i][columna].equals("*")) {
                             sePuedeColocar = false;
                             break;
                         }
@@ -48,35 +46,56 @@ public class BatallaNaval{
                 }
             }
 
-         
             if (sePuedeColocar) {
                 if (orientacion == 0) {
                     for (int j = 0; j < tamaño; j++) {
-                        matriz[fila][columna + j] = "*"; //desplazamiento del barco de manera horizonal
+                        matriz[fila][columna + j] = "*";
                     }
                 } else {
                     for (int i = 0; i < tamaño; i++) {
-                        matriz[fila + i][columna] = "*"; // desplazamiento del barco de manera vertical
+                        matriz[fila + i][columna] = "*";
                     }
                 }
-                barcos--; 
+                barcos--;
             }
         }
     }
 
-
-    public static void mostrar(String[][] matriz) {
+    public static void mostrarJugador(String[][] matriz) {
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
-                System.out.print(matriz[i][j] + " ");
+                if (matriz[i][j].equals("*")) {
+                    System.out.print("~ "); 
+                } else {
+                    System.out.print(matriz[i][j] + " ");
+                }
             }
             System.out.println();
         }
     }
 
+    public static int jugarTurno(String[][] tablero, Scanner sc) {
+        mostrarJugador(tablero);
+        System.out.print("Ingresa fila (0-8): ");
+        int fila = sc.nextInt();
+        System.out.print("Ingresa columna (0-8): ");
+        int columna = sc.nextInt();
+
+        if (tablero[fila][columna].equals("*")) {
+            System.out.println("encontraste un barco");
+            tablero[fila][columna] = "X";
+            return 1; 
+        } else {
+            System.out.println(" agua");
+            tablero[fila][columna] = "o";
+            return 0;
+        }
+    }
+
     public static void main(String[] args) {
-        String[][] matriz1 = new String[9][9];
+        String[][] matriz1 = new String[9][9]; 
         String[][] matriz2 = new String[9][9];
+
 
         inicializar(matriz1);
         inicializar(matriz2);
@@ -84,10 +103,31 @@ public class BatallaNaval{
         colocarBarcos(matriz1);
         colocarBarcos(matriz2);
 
-        System.out.println("Tablero 1:");
-        mostrar(matriz1);
+        Scanner sc = new Scanner(System.in);
+        int barcos1 = 6; 
+        int barcos2 = 6; 
 
-        System.out.println("\nTablero 2:");
-        mostrar(matriz2);
+   
+
+        while (barcos1 > 0 && barcos2 > 0) {
+            System.out.println("turno Jugador 1:");
+            barcos2 -= jugarTurno(matriz2, sc);
+
+            if (barcos2 == 0) {
+                System.out.println("Jugador 1 ha ganado, hundió todos los barcos del Jugador 2");
+                break;
+            }
+
+            System.out.println("Turno Jugador 2:");
+            barcos1 -= jugarTurno(matriz1, sc);
+
+            if (barcos1 == 0) {
+                System.out.println(" Jugador 2 ha ganado, hundió todos los barcos del Jugador 1");
+                break;
+            }
+        }
     }
 }
+
+
+	
